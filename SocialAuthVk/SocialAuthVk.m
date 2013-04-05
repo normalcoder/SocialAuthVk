@@ -60,12 +60,14 @@ userID:(NSString *)userID {
 
 #pragma mark -
 
-- (void)loginSuccess:(void (^)(SocialAuthVkSuccessObject *))success
+- (void)loginWithBaseViewController:(UIViewController *)viewController
+                            success:(void (^)(SocialAuthVkSuccessObject *))success
              failure:(void (^)(NSError *))failure {
     UIWindow * window = [[[UIApplication sharedApplication] windows] objectAtIndex:0];
     
     [[Vkontakte sharedInstance]
-     authenticateBaseViewController:window.rootViewController
+     authenticateBaseViewController:
+     viewController ?: window.rootViewController
      success:^(NSString * token, NSString * userID){
          success([SocialAuthVkSuccessObject socialAuthSuccessObjectVkWithAuthToken:token
                                                                             userID:userID]);
@@ -74,6 +76,11 @@ userID:(NSString *)userID {
      } cancel:^{
          failure([NSError errorWithDomain:VkErrorDomain code:VkAuthCancelledErrorCode userInfo:@{NSLocalizedDescriptionKey : @"Vk auth cancelled error"}]);
      }];
+}
+
+- (void)loginSuccess:(void (^)(SocialAuthVkSuccessObject *))success
+             failure:(void (^)(NSError *))failure {
+    [self loginWithBaseViewController:nil success:success failure:failure];
 }
 
 - (void)logoutFinish:(void (^)())finish {
