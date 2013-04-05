@@ -4,19 +4,24 @@
 
 @interface SocialAuthVkSuccessObject ()
 
-@property (strong, nonatomic) NSString * authCode;
+@property (strong, nonatomic) NSString * authToken;
+@property (strong, nonatomic) NSString * userID;
 
 @end
 
 @implementation SocialAuthVkSuccessObject
 
-+ (id)socialAuthSuccessObjectFbWithAuthCode:(NSString *)authCode {
-    return [[self alloc] initWithAuthCode:authCode];
++ (id)socialAuthSuccessObjectVkWithAuthToken:(NSString *)authToken
+userID:(NSString *)userID {
+    return [[self alloc] initWithAuthToken:authToken
+                                    userID:userID];
 }
 
-- (id)initWithAuthCode:(NSString *)authCode {
+- (id)initWithAuthToken:(NSString *)authToken
+                 userID:(NSString *)userID {
     if ((self = [super init])) {
-        self.authCode = authCode;
+        self.authToken = authToken;
+        self.userID = userID;
     }
     return self;
 }
@@ -25,7 +30,7 @@
 
 @implementation SocialAuthVk
 
-+ (id)sharedInstance {
++ (instancetype)sharedInstance {
     static dispatch_once_t pred;
     static id instance;
     dispatch_once(&pred, ^{
@@ -45,14 +50,25 @@
 
 #pragma mark -
 
+- (SocialAuthVkAuthType)authType {
+    return (SocialAuthVkAuthType)[[Vkontakte sharedInstance] authType];
+}
+
+- (void)setAuthType:(SocialAuthVkAuthType)authType {
+    [[Vkontakte sharedInstance] setAuthType:(VKAuthType)authType];
+}
+
+#pragma mark -
+
 - (void)loginSuccess:(void (^)(SocialAuthVkSuccessObject *))success
              failure:(void (^)(NSError *))failure {
     UIWindow * window = [[[UIApplication sharedApplication] windows] objectAtIndex:0];
     
     [[Vkontakte sharedInstance]
      authenticateBaseViewController:window.rootViewController
-     success:^(NSString * code){
-         success([SocialAuthVkSuccessObject socialAuthSuccessObjectFbWithAuthCode:code]);
+     success:^(NSString * token, NSString * userID){
+         success([SocialAuthVkSuccessObject socialAuthSuccessObjectVkWithAuthToken:token
+                                                                            userID:userID]);
      } failure:^(NSError * e){
          failure(e);
      } cancel:^{
@@ -61,7 +77,7 @@
 }
 
 - (void)logoutFinish:(void (^)())finish {
-    [[Vkontakte sharedInstance] logoutFinish:finish];
+    [[Vkontakte sharedInstance] logout];
 }
 
 @end
