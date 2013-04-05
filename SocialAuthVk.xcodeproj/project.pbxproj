@@ -203,6 +203,7 @@
 					"../Vkontakte-iOS-SDK/Vkontakte",
 					"../Vkontakte-iOS-SDK/Vkontakte-iOS-SDK_Demo/MBProgressHud",
 				);
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -244,6 +245,7 @@
 				7F6BF7DE1680975200E94B84 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
